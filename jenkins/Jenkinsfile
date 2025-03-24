@@ -1,0 +1,57 @@
+pipeline {
+    agent any
+
+    environment {
+        DOCKER_HUB = credentials('docker-hub-credentials')
+        KUBECONFIG = credentials('kubeconfig')
+    }
+
+    stages {
+        stage('Checkout') {
+            steps {
+                git branch: 'main', 
+                url: 'https://github.com/ndayizeye69/24RP14753-Home-Stock-Management.git'
+            }
+        }
+
+        stage('Build & Push Docker Images') {
+            steps {
+                script {
+                   
+                    sh 'docker build -t ndayizeye69/home-stock-backend:latest ./backend'
+                    sh "echo \$DOCKER_HUB_PSW | docker login -u \$DOCKER_HUB_USR --password-stdin"
+                    sh 'docker push ndayizeye69/home-stock-backend:latest'
+
+                   
+                    sh 'docker build -t ndayizeye69/shopping-list:latest ./microservice'
+                    sh 'docker push ndayizeye69/shopping-list:latest'
+                }
+            }
+        }
+
+        stage('Deploy to Kubernetes') {
+            steps {
+                sh '''
+                kubectl apply -f k8s/mongo-deployment.yaml
+                kubectl apply -f k8s/backend-deployment.yaml
+                kubectl apply -f k8s/microservice-deployment.yaml
+                kubectl apply -f k8s/nginx-ingress.yaml
+                '''
+            }
+        }
+
+        stage('Verify Deployment') {
+            steps {
+                sh 'kubectl get pods'
+                sh 'kubectl get services'
+                sh 'curl http://localhost/api/items'  
+            }
+        }
+    }
+
+    post {
+        always {
+            cleanWs()
+        }
+    }
+}
