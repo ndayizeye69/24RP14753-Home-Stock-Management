@@ -1,0 +1,31 @@
+{
+  "name": "backend",
+  "version": "1.0.0",
+  "description": "Home Stock Management System - Backend API",
+  "main": "app.js",
+  "scripts": {
+    "start": "node app.js",
+    "dev": "nodemon app.js",
+    "test": "jest --coverage",
+    "docker:build": "docker build -t 24rp14753/home-stock-backend .",
+    "docker:run": "docker run -p 3000:3000 24rp14753/home-stock-backend"
+  },
+  "dependencies": {
+    "cors": "^2.8.5",
+    "express": "^4.21.2",
+    "joi": "^17.13.3",
+    "mongoose": "^8.12.2"
+  },
+  "devDependencies": {
+    "jest": "^29.7.0",
+    "nodemon": "^3.1.0",
+    "supertest": "^6.3.3"
+  },
+  "keywords": [
+    "inventory",
+    "home-stock",
+    "nodejs"
+  ],
+  "author": "24RP14753",
+  "license": "ISC"
+}
